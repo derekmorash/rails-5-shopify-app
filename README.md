@@ -11,11 +11,12 @@
 
 1. Experience with Ruby and Rails
 2. Updated versions of Ruby, Rails, and Docker.
-    
+
     1. [Install Ruby On Rails](https://gorails.com/setup/)
-    
     2. [Get started with Docker](https://www.docker.com/get-started)
+   
 3. Docker experience
+4. ngrok account created and installed. [Get started with ngrok](https://dashboard.ngrok.com/user/signup)
 
 ## 1. Create a new rails app using postgres as the database 
 
@@ -39,7 +40,7 @@ Be sure to change `app_name` to your apps name.
     RAILS_MAX_THREADS=1
     WEB_CONCURRENCY=1
 
-    DATABASE_URL=postgresql://exportifyapp_development:yourpassword@postgres:5432/exportifyapp_development?encoding=utf8&pool=5&timeout=5000
+    DATABASE_URL=postgresql://app_name_development:yourpassword@postgres:5432/app_name_development?encoding=utf8&pool=5&timeout=5000
 
     POSTGRES_DB='app_name_development'
     POSTGRES_USER='app_name_development'
@@ -64,33 +65,33 @@ Be sure to change `app_name` to your apps name.
 
 4. Create _.dockerignore_ with the following:
    
-   ```
-   .byebug_history
-   .dockerignore
-   .git
-   log/*
-   tmp/*
-   ```
+    ```
+    .byebug_history
+    .dockerignore
+    .git
+    log/*
+    tmp/*
+    ```
 
 5. Create _Dockerfile_ with the following:
 
-   ```
-   FROM ruby:2.5.1-alpine
+    ```
+    FROM ruby:2.5.1-alpine
 
-   RUN apk update && apk add build-base nodejs postgresql-dev
+    RUN apk update && apk add build-base nodejs postgresql-dev
 
-   RUN mkdir /app
-   WORKDIR /app
+    RUN mkdir /app
+    WORKDIR /app
 
-   COPY Gemfile Gemfile.lock ./
-   RUN bundle install --binstubs
+    COPY Gemfile Gemfile.lock ./
+    RUN bundle install --binstubs
 
-   COPY . .
+    COPY . .
 
-   LABEL maintainer="Able Sense <support@ablesense.com>"
+    LABEL maintainer="Able Sense <support@ablesense.com>"
 
-   CMD puma -C config/puma.rb
-   ```
+    CMD puma -C config/puma.rb
+    ```
 
    This sets up the container for the rails server. It first installs some packages we'll need, copies Gemfile and Gemfile.lock (more on this later), runs bundle install, copies the app into the container, then starts the server.
 
@@ -98,56 +99,56 @@ Be sure to change `app_name` to your apps name.
 
 6. Create _docker-compose.yml_ with the following:
 
-   ```
-   version: '3'
+    ```yml
+    version: '3'
 
-   services:
-     postgres:
-       image: 'postgres:10.4-alpine'
-       environment:
-         POSTGRES_DB: 'shopify_base_app_development'
-         POSTGRES_USER: 'shopify_base_app_development'
-         POSTGRES_PASSWORD: 'yourpassword'
-       volumes:
-         - 'postgres:/var/lib/postgresql/data'
-       env_file:
-         - '.env'
-  
-     redis:
-       image: 'redis:4.0-alpine'
-       command: redis-server
-       volumes:
-         - 'redis:/data'
-       env_file:
-         - '.env'
+    services:
+      postgres:
+        image: 'postgres:10.4-alpine'
+        environment:
+          POSTGRES_DB: 'shopify_base_app_development'
+          POSTGRES_USER: 'shopify_base_app_development'
+          POSTGRES_PASSWORD: 'yourpassword'
+        volumes:
+          - 'postgres:/var/lib/postgresql/data'
+        env_file:
+          - '.env'
 
-     web:
-       depends_on:
-         - 'postgres'
-         - 'redis'
-       build: .
-       ports:
-         - '3000:3000'
-       env_file:
-         - '.env'
-       volumes:
-         - '.:/app'
+      redis:
+        image: 'redis:4.0-alpine'
+        command: redis-server
+        volumes:
+          - 'redis:/data'
+        env_file:
+          - '.env'
 
-     sidekiq:
-       depends_on:
-         - 'postgres'
-         - 'redis'
-       build: .
-       command: sidekiq -C config/sidekiq.yml.erb
-       volumes:
-         - '.:/app'
-       env_file:
-         - '.env'
+      web:
+        depends_on:
+          - 'postgres'
+          - 'redis'
+        build: .
+        ports:
+          - '3000:3000'
+        env_file:
+          - '.env'
+        volumes:
+          - '.:/app'
 
-   volumes:
-     redis: {}
-     postgres: {}
-   ```
+      sidekiq:
+        depends_on:
+          - 'postgres'
+          - 'redis'
+        build: .
+        command: sidekiq -C config/sidekiq.yml.erb
+        volumes:
+          - '.:/app'
+        env_file:
+          - '.env'
+
+    volumes:
+      redis: {}
+      postgres: {}
+    ```
 
    Docker compose is used to run our containers and setup any others we may need like postgres, redis, and sidekiq. Each services has some configuration options set to allow the containers to talk to each other. Be sure to change `app_name` to your apps name.
 
@@ -157,29 +158,29 @@ Be sure to change `app_name` to your apps name.
 
 - __YES?__
 
-   Log into your ngrok dashboard and go to https://dashboard.ngrok.com/reserved.
+    Log into your ngrok dashboard and go to https://dashboard.ngrok.com/reserved.
 
-   If you already have a subdomain reserved find it in the list and copy just the subdomain, leave off the `.ngrok.io`.
+    If you already have a subdomain reserved find it in the list and copy just the subdomain, leave off the `.ngrok.io`.
 
-   If you haven't already reserved a subdomain then create a new one on that same page.
+    If you haven't already reserved a subdomain then create a new one on that same page.
 
-   ![Reserve ngrok subdomain](assets/reserve-subdomain.png)
+    ![Reserve ngrok subdomain](assets/reserve-subdomain.png)
 
-   In your terminal run:
-   
-   ```
-   ngrok http -subdomain=my-app 3000
-   ```
+    In your terminal run:
+    
+    ```
+    ngrok http -subdomain=my-app 3000
+    ```
 
 - __NO?__
 
-   In your terminal run:
-   
-   ```
-   ngrok http 3000
-   ```
+    In your terminal run:
+    
+    ```
+    ngrok http 3000
+    ```
 
-   _Note that if you're not using a reserved subdomain you will have to update the url for your app in the partners dashboard every time you restart ngrok._
+    _Note that if you're not using a reserved subdomain you will have to update the url for your app in the partners dashboard every time you restart ngrok._
 
 Now that ngrok is listening on port 3000 it will list some info. Look for the forwarding address that uses https and copy it for use in the next step.
 
@@ -199,24 +200,24 @@ _Note that if you're not using a reserved subdomain you will have to update the 
 
 1. Open `.env` and update the following
 
-   1. `COMPOSE_PROJECT_NAME` name of your app
-   2. `SHOPIFY_API_KEY` provided by shopify after creating a new app
-   3. `SHOPIFY_API_SECRET_KEY` provided by shopify after creating a new app
-   4. `APP_BASE_URL` the ngrok forwarding URL
+    1. `COMPOSE_PROJECT_NAME` name of your app
+    2. `SHOPIFY_API_KEY` provided by shopify after creating a new app
+    3. `SHOPIFY_API_SECRET_KEY` provided by shopify after creating a new app
+    4. `APP_BASE_URL` the ngrok forwarding URL
 
 2. Open `config/database.yml`
    
    Under the `development` section add the following lines:
 
-   ```
-   database: <%= ENV['POSTGRES_DB'] %>
-   username: <%= ENV['POSTGRES_USER'] %>
-   password: <%= ENV['POSTGRES_PASSWORD'] %>
-   ```
+    ``` yml
+    database: <%= ENV['POSTGRES_DB'] %>
+    username: <%= ENV['POSTGRES_USER'] %>
+    password: <%= ENV['POSTGRES_PASSWORD'] %>
+    ```
 
 3. Create `config/initializers/sidekiq.rb` with the following:
     
-    ```
+    ```rb
     if Rails.env.development?
       Sidekiq.configure_client do |config|
         config.redis = { url: ENV['REDIS_DEV_URL'], size: ENV['SIDEKIQ_CONNECTIONS'] }
@@ -261,15 +262,15 @@ _Note that if you're not using a reserved subdomain you will have to update the 
 
 4. Open `Gemfile`
    
-   - Make sure ruby version is 2.5.1
-   - add `gem 'shopify_app'` above the rails gem
-   - add `gem 'sidekiq'`
-   - add `gem 'redis', '~> 4.0'`
-   - change `gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]` to just be `gem 'tzinfo-data'`. Our docker container needs to use this gem but by default it is locked down to certain platforms.
+    - Make sure ruby version is 2.5.1
+    - add `gem 'shopify_app'` above the rails gem
+    - add `gem 'sidekiq'`
+    - add `gem 'redis', '~> 4.0'`
+    - change `gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]` to just be `gem 'tzinfo-data'`. Our docker container needs to use this gem but by default it is locked down to certain platforms.
 
 5. Rename `Gemfile.lock` to `Gemfile.lock.old`, then create an empty `Gemfile.lock`
    
-   Bundle install will fail inside the docker container if this file was created when creating the rails app on our local machine. We want to let docker create it's own lock file from our updated Gemfile.
+    Bundle install will fail inside the docker container if this file was created when creating the rails app on our local machine. We want to let docker create it's own lock file from our updated Gemfile.
 
 ## 6. Build and spin up the docker containers
 
@@ -294,20 +295,30 @@ There are just a few things left to do to turn our Rails app into a Shopify app.
     ```
     docker-compose exec web rails generate shopify_app:install
     ```
+
 2.  Create the shop table, model, and controller
     
     ```
     docker-compose exec web rails generate shopify_app:shop_model
     ```
+
 3. Run the migrations to create the shop table in the database
     
     ```
     docker-compose exec web rails db:migrate
     ```
+
 4.  Generate resources to create a basic page that installed users will see. This page is just an example use of the Shopify API to print out a few products from the store and list the webhooks set up for this app.
-    
+
     ```
     docker-compose exec web rails generate shopify_app:home_controller
+    ```
+
+5.  Open `config/initializers/shopify_app.rb` and change the following lines:
+
+    ```rb
+    config.api_key = ENV['SHOPIFY_API_KEY']
+    config.secret = ENV['SHOPIFY_API_SECRET_KEY']
     ```
 
 ## 8. Get to work
@@ -316,3 +327,27 @@ With ngrok running and all containers up you should be able to open the ngrok fo
 
 ![App install screen](assets/app-install.png)
 
+
+## Helpful commands
+
+- Tail rails logs 
+
+    ```
+    docker-compose exec web tail -f log/development.log
+    ```
+
+- Rails commands
+  
+    ```
+    docker-compose exec web rails db:migrate
+    ```
+
+    ```
+    docker-compose exec web rails console
+    ```
+
+- Access postgres from the command line
+    
+    ```
+    docker-compose exec postgres psql -U app_name_development
+    ```
