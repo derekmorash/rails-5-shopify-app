@@ -29,30 +29,30 @@ Be sure to change `app_name` to your apps name.
 1. Add `.env` to `.gitignore`
 2. Create `.env.template` with the following:
    
-   ```
-   COMPOSE_PROJECT_NAME=app_name
+    ```
+    COMPOSE_PROJECT_NAME=app_name
 
-   RAILS_ENV=development
-   SECRET_TOKEN=asecuretokenwouldnormallygohere
+    RAILS_ENV=development
+    SECRET_TOKEN=asecuretokenwouldnormallygohere
 
-   BIND_ON=0.0.0.0:5000
-   RAILS_MAX_THREADS=1
-   WEB_CONCURRENCY=1
+    BIND_ON=0.0.0.0:5000
+    RAILS_MAX_THREADS=1
+    WEB_CONCURRENCY=1
 
-   DATABASE_URL=postgresql://exportifyapp_development:yourpassword@postgres:5432/exportifyapp_development?encoding=utf8&pool=5&timeout=5000
+    DATABASE_URL=postgresql://exportifyapp_development:yourpassword@postgres:5432/exportifyapp_development?encoding=utf8&pool=5&timeout=5000
 
-   POSTGRES_DB='app_name_development'
-   POSTGRES_USER='app_name_development'
-   POSTGRES_PASSWORD='yourpassword'
+    POSTGRES_DB='app_name_development'
+    POSTGRES_USER='app_name_development'
+    POSTGRES_PASSWORD='yourpassword'
 
-   REDIS_DEV_URL=redis://redis:6379/0
+    REDIS_DEV_URL=redis://redis:6379/0
 
-   SHOPIFY_API_KEY=
-   SHOPIFY_API_SECRET_KEY=
-   APP_BASE_URL=
+    SHOPIFY_API_KEY=
+    SHOPIFY_API_SECRET_KEY=
+    APP_BASE_URL=
 
-   assets=precompile
-   ```
+    assets=precompile
+    ```
 
    Be sure to change `app_name` to your apps name in POSTGRES_DB and POSTGRES_USER.
 
@@ -98,7 +98,7 @@ Be sure to change `app_name` to your apps name.
 
 6. Create _docker-compose.yml_ with the following:
 
-   ```yml
+   ```
    version: '3'
 
    services:
@@ -207,7 +207,8 @@ _Note that if you're not using a reserved subdomain you will have to update the 
 2. Open `config/database.yml`
    
    Under the `development` section add the following lines:
-   ```yml
+
+   ```
    database: <%= ENV['POSTGRES_DB'] %>
    username: <%= ENV['POSTGRES_USER'] %>
    password: <%= ENV['POSTGRES_PASSWORD'] %>
@@ -215,7 +216,7 @@ _Note that if you're not using a reserved subdomain you will have to update the 
 
 3. Create `config/initializers/sidekiq.rb` with the following:
     
-    ```rb
+    ```
     if Rails.env.development?
       Sidekiq.configure_client do |config|
         config.redis = { url: ENV['REDIS_DEV_URL'], size: ENV['SIDEKIQ_CONNECTIONS'] }
