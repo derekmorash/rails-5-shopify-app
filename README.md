@@ -11,10 +11,11 @@
 
 1. Experience with Ruby and Rails
 2. Updated versions of Ruby, Rails, and Docker.
+    
     1. [Install Ruby On Rails](https://gorails.com/setup/)
+    
     2. [Get started with Docker](https://www.docker.com/get-started)
 3. Docker experience
-4. 
 
 ## 1. Create a new rails app using postgres as the database 
 
@@ -27,6 +28,7 @@ Be sure to change `app_name` to your apps name.
 ## 2. Set up docker in your new rails app
 1. Add `.env` to `.gitignore`
 2. Create `.env.template` with the following:
+   
    ```
    COMPOSE_PROJECT_NAME=app_name
 
@@ -61,6 +63,7 @@ Be sure to change `app_name` to your apps name.
    _.env.template_ is committed to git as a starting point for others to develop locally. _.env_ is ignored from git because it will have API keys and secrets that no one should have access to.
 
 4. Create _.dockerignore_ with the following:
+   
    ```
    .byebug_history
    .dockerignore
@@ -163,6 +166,7 @@ Be sure to change `app_name` to your apps name.
    ![Reserve ngrok subdomain](assets/reserve-subdomain.png)
 
    In your terminal run:
+   
    ```
    ngrok http -subdomain=my-app 3000
    ```
@@ -170,6 +174,7 @@ Be sure to change `app_name` to your apps name.
 - __NO?__
 
    In your terminal run:
+   
    ```
    ngrok http 3000
    ```
@@ -200,6 +205,7 @@ _Note that if you're not using a reserved subdomain you will have to update the 
    4. `APP_BASE_URL` the ngrok forwarding URL
 
 2. Open `config/database.yml`
+   
    Under the `development` section add the following lines:
    ```yml
    database: <%= ENV['POSTGRES_DB'] %>
@@ -208,6 +214,7 @@ _Note that if you're not using a reserved subdomain you will have to update the 
    ```
 
 3. Create `config/initializers/sidekiq.rb` with the following:
+    
     ```rb
     if Rails.env.development?
       Sidekiq.configure_client do |config|
@@ -228,8 +235,6 @@ _Note that if you're not using a reserved subdomain you will have to update the 
         end
       end
     end
-
-
 
     if Rails.env.production?
 
@@ -254,6 +259,7 @@ _Note that if you're not using a reserved subdomain you will have to update the 
     ```
 
 4. Open `Gemfile`
+   
    - Make sure ruby version is 2.5.1
    - add `gem 'shopify_app'` above the rails gem
    - add `gem 'sidekiq'`
@@ -261,9 +267,11 @@ _Note that if you're not using a reserved subdomain you will have to update the 
    - change `gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]` to just be `gem 'tzinfo-data'`. Our docker container needs to use this gem but by default it is locked down to certain platforms.
 
 5. Rename `Gemfile.lock` to `Gemfile.lock.old`, then create an empty `Gemfile.lock`
+   
    Bundle install will fail inside the docker container if this file was created when creating the rails app on our local machine. We want to let docker create it's own lock file from our updated Gemfile.
 
 ## 6. Build and spin up the docker containers
+
 Now that everything is configured we can build our containers and get them up and running to start working on our app.
 
 - run `docker-compose build` to download the images and build the containers. This may take a few minutes.
@@ -281,18 +289,22 @@ With ngrok running and all containers up you should be able to open the ngrok fo
 There are just a few things left to do to turn our Rails app into a Shopify app. With docker running, start by opening a new terminal.
 
 1. Generate shopify app. Since we're using environment variables for the app api key and secret we don't want to use the optional arguments for that command.
+    
     ```
     docker-compose exec web rails generate shopify_app:install
     ```
 2.  Create the shop table, model, and controller
+    
     ```
     docker-compose exec web rails generate shopify_app:shop_model
     ```
 3. Run the migrations to create the shop table in the database
+    
     ```
     docker-compose exec web rails db:migrate
     ```
 4.  Generate resources to create a basic page that installed users will see. This page is just an example use of the Shopify API to print out a few products from the store and list the webhooks set up for this app.
+    
     ```
     docker-compose exec web rails generate shopify_app:home_controller
     ```
