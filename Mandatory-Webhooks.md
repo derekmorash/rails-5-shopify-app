@@ -1,12 +1,12 @@
 # Handle Shopify Mandatory Webhooks in Ruby on Rails
 
-Since May 25th, 2018 GDPR has imposed obligations on any party that collects, stores, or processes personal data. App developers have the responsibility to comply to these regulations. Fortunately, Shopify has implemented endpoints to help app developers deal with data privacy to meet the requirements of GDPR.
+Since May 25th, 2018 GDPR has imposed obligations on any party that collects, stores, or processes personal data. App developers have the responsibility to comply with these regulations. Fortunately, Shopify has implemented endpoints to help app developers deal with data privacy to meet the requirements of GDPR.
 
 Read about [Shopify API GDPR requirements](https://help.shopify.com/en/api/guides/gdpr-resources).
 
 ## Mandatory Webhooks
 
-Mandatory webhooks differ slightly from regular webhooks from Shopify. If you're using the *shopify_app* gem you can use the [webhooks manager](https://github.com/Shopify/shopify_app#webhooksmanager) to configure your apps needed webhooks. Unfortunately this only works for the regular Shopify admin API events, the mandatory webhooks have to be setup manually. This doesn't mean the app gem can't help us out, we'll still use it for verifying webhooks, more on that later.
+Mandatory webhooks differ slightly from regular webhooks from Shopify. If you're using the *shopify_app* gem you can use the [webhooks manager](https://github.com/Shopify/shopify_app#webhooksmanager) to configure your apps needed webhooks. Unfortunately this only works for the regular Shopify admin API events, the mandatory webhooks have to be set up manually. This doesn't mean the app gem can't help us out, we'll still use it for verifying webhooks, more on that later.
 
 Read about [getting started with Shopify webhooks](https://help.shopify.com/en/api/getting-started/webhooks).
 
@@ -46,7 +46,7 @@ Now we can use `webhook_params` in our controller methods to access the data sen
 
 Webhooks need to be verified before being processed to be sure that the request came from shopify and not someone else.
 
-In the header of the request Shopify includes a HMAC. This is the SHA256 digest calculated from the body of the request and your apps shared secret. To verify the webhook you have to calculate this HMAC and compare it to the one in the request header, if they match then it is a valid webhook from Shopify.
+In the header of the request, Shopify includes an HMAC. This is the SHA256 digest calculated from the body of the request and your apps shared secret. To verify the webhook you have to calculate this HMAC and compare it to the one in the request header, if they match then it is a valid webhook from Shopify.
 
 Shopify's [getting started with webhooks guide](https://help.shopify.com/en/api/getting-started/webhooks#verify-webhook) has a good section on how to manually verify webhooks.
 
@@ -87,9 +87,9 @@ controller :mandatory_webhooks do
 end
 ```
 
-We then have to go into our apps setup in the partners dashboard and find the mandatory webhooks section. Here we specify the URLs for each webhook endpoint.
+We then have to go into our apps set up in the partners dashboard and find the mandatory webhooks section. Here we specify the URLs for each webhook endpoint.
 
-![Shopify app setup mandatory webhooks](assets/mandatory-webhooks.png)
+![Shopify app set up mandatory webhooks](assets/mandatory-webhooks.png)
 
 Shopify can now send a mandatory webhook to our app and we will verify it and respond accordingly.
 
@@ -111,9 +111,9 @@ class ShopRedactJob < ActiveJob::Base
 end
 ```
 
-In this job we can do all the processing we want like creating support tickets, deleting database information, sending emails, etc.
+In this job, we can do all the processing we want like creating support tickets, deleting database information, sending emails, etc.
 
-Lastly we need to queue the job when the webhook is received. Modify the controller methods for each endpoint like this:
+Lastly, we need to queue the job when the webhook is received. Modify the controller methods for each endpoint like this:
 
 ```rb
 def shop_redact
