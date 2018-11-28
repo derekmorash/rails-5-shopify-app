@@ -2,7 +2,7 @@
 
 Webhooks are a way for Shopify to send data to your app when events in a merchants store happen, such as order or product updates. The ShopifyApp gem makes it easy to subscribe to and manage the webhooks that are required for your app. We'll look at two ways of handling webhooks using the ShopifyApp gem in Ruby on Rails.
 
-### Note about Mandatory Webhooks
+**Note about Mandatory Webhooks:**
 
 If you're using the *shopify_app* gem you can use the [webhooks manager](https://github.com/Shopify/shopify_app#webhooksmanager) to configure the webhooks our app needs. However, Mandatory webhooks differ slightly in the way they're configured. I have another article about how to set these up [Mandatory-Webhooks.md]().
 
