@@ -1,8 +1,19 @@
-version: '3'
+version: '3.7'
 
 services:
+  # postgres:
+  #   image: 'postgres:10.4-alpine'
+  #   environment:
+  #     POSTGRES_DB: 'shopify_base_app_development'
+  #     POSTGRES_USER: 'shopify_base_app_development'
+  #     POSTGRES_PASSWORD: 'yourpassword'
+  #   volumes:
+  #     - 'postgres:/var/lib/postgresql/data'
+  #   env_file:
+  #     - '.env'
+
   postgres:
-    image: 'postgres:10.4-alpine'
+    image: 'postgres:11.5-alpine'
     environment:
       POSTGRES_DB: 'shopify_base_app_development'
       POSTGRES_USER: 'shopify_base_app_development'
@@ -13,7 +24,7 @@ services:
       - '.env'
   
   redis:
-    image: 'redis:4.0-alpine'
+    image: 'redis:5.0.5-alpine'
     command: redis-server
     volumes:
       - 'redis:/data'
@@ -37,7 +48,7 @@ services:
       - 'postgres'
       - 'redis'
     build: .
-    command: sidekiq -C config/sidekiq.yml.erb
+    command: sidekiq -C config/sidekiq.yml
     volumes:
       - '.:/app'
     env_file:

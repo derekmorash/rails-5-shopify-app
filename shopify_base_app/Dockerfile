@@ -1,4 +1,4 @@
-FROM ruby:2.5.1-alpine
+FROM ruby:2.6.3-alpine
 
 RUN apk update && apk add build-base nodejs postgresql-dev
 
